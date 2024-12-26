@@ -1,13 +1,27 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import type { NextApiRequest, NextApiResponse } from 'next'
+import { OpenAI } from 'openai';
 
-type Data = {
-  name: string
-}
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY, // Use the environment variable
+});
 
-export default function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Data>
-) {
-  res.status(200).json({ name: 'John Doe' })
+export default async function handler(req, res) {
+  if (req.method === 'POST') {
+    const { message } = req.body; // Get the message from the frontend
+
+    try {
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4', // You can also use 'gpt-3.5-turbo'
+        messages: [
+          { role: 'user', content: message },
+        ],
+      });
+
+      res.status(200).json({ reply: completion.choices[0].message.content });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Error communicating with OpenAI' });
+    }
+  } else {
+    res.status(405).json({ error: 'Method Not Allowed' });
+  }
 }
