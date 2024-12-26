@@ -1,12 +1,12 @@
 import { OpenAI } from 'openai';
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // Use the environment variable
+  apiKey: process.env.OPENAI_API_KEY, // Ensure you're using the Vercel environment variable
 });
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { message } = req.body; // Get the message from the frontend
+    const { message } = req.body;
 
     try {
       const completion = await openai.chat.completions.create({
@@ -25,4 +25,3 @@ export default async function handler(req, res) {
     res.status(405).json({ error: 'Method Not Allowed' });
   }
 }
-
